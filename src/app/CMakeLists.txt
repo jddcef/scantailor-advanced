@@ -57,11 +57,21 @@ if (WIN32)
       OBJECT_DEPENDS ${win32_resources})
   if (MINGW)
     # CMake doesn't know how to process .rc files with MinGW.
+    set(windres_command "${CMAKE_RC_COMPILER}")
+    if (NOT windres_command)
+      get_filename_component(c_compiler_name "${CMAKE_C_COMPILER}" NAME)
+      string(REGEX REPLACE "gcc(-[0-9.]+)?$" "windres" windres_name "${c_compiler_name}")
+      find_program(windres_command NAMES "${windres_name}" windres)
+    endif()
+    if (NOT windres_command)
+      message(FATAL_ERROR "Could not find the MinGW windres compiler.")
+    endif()
+
     set(win32_resource_file "${CMAKE_BINARY_DIR}/win32_resources.o")
     add_custom_command(
         OUTPUT "${win32_resource_file}"
         WORKING_DIRECTORY "${SCANTAILOR_RESOURCES_DIR}/win32"
-        COMMAND windres -i "${rc_file}" -o "${win32_resource_file}"
+        COMMAND "${windres_command}" -i "${rc_file}" -o "${win32_resource_file}"
         MAIN_DEPENDENCY "${rc_file}"
         DEPENDS ${win32_resources})
   else()
