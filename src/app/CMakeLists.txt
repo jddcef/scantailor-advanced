@@ -48,7 +48,12 @@ set(gui_only_ui_files
 
 set(win32_resource_file "")
 if (WIN32)
-  string(REPLACE "/" "\\\\" SCANTAILOR_WIN_DIR_NATIVE "${SCANTAILOR_RESOURCES_DIR}/win32")
+  if (MINGW)
+    set(SCANTAILOR_WIN_ICON "${SCANTAILOR_RESOURCES_DIR}/win32/scantailor-advanced.ico")
+  else()
+    string(REPLACE "/" "\\\\" SCANTAILOR_WIN_DIR_NATIVE "${SCANTAILOR_RESOURCES_DIR}/win32")
+    set(SCANTAILOR_WIN_ICON "${SCANTAILOR_WIN_DIR_NATIVE}\\scantailor-advanced.ico")
+  endif()
   configure_file("${SCANTAILOR_RESOURCES_DIR}/win32/resources.rc.in" "${CMAKE_BINARY_DIR}/resources.rc" @ONLY)
   set(rc_file "${CMAKE_BINARY_DIR}/resources.rc")
   file(GLOB win32_resources "${SCANTAILOR_RESOURCES_DIR}/win32/*.ico")
